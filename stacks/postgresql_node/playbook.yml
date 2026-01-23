@@ -8,13 +8,13 @@
 
   tasks:
     # Install prerequisites
-    - include_tasks: tasks/prerequisites.yml
+    - include: tasks/prerequisites.yml
 
     # Install PostgreSQL
-    - include_tasks: tasks/postgresql.yml
+    - include: tasks/postgresql.yml
 
     # Install Node.js
-    - include_tasks: tasks/nodejs.yml
+    - include: tasks/nodejs.yml
 
     # Install Nginx
-    - include_tasks: tasks/nginx.yml
+    - include: tasks/nginx.yml

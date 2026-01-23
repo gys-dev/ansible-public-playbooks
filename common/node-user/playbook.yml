@@ -17,4 +17,4 @@
       ignore_errors: yes
 
     # Install Node.js
-    - include_tasks: tasks/nodejs.yml
+    - include: tasks/nodejs.yml

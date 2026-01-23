@@ -1,19 +1,19 @@
 ---
 # Variable configuration.
-- include_tasks: variables.yml
+- include: variables.yml
 
 # Setup/install tasks.
-- include_tasks: setup-Archlinux.yml
+- include: setup-Archlinux.yml
   when: ansible_os_family == 'Archlinux'
 
-- include_tasks: setup-Debian.yml
+- include: setup-Debian.yml
   when: ansible_os_family == 'Debian'
 
-- include_tasks: setup-RedHat.yml
+- include: setup-RedHat.yml
   when: ansible_os_family == 'RedHat'
 
-- include_tasks: initialize.yml
-- include_tasks: configure.yml
+- include: initialize.yml
+- include: configure.yml
 
 - name: Ensure PostgreSQL is started and enabled on boot.
   service:
