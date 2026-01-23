@@ -1,20 +1,15 @@
-# Ansible
-Ansible is the simplest way to automate apps and IT infrastructure. Application Deployment + Configuration Management + Continuous Delivery.
+# Node.js + MySQL Stack
 
-#### Description
-Ansible Playbook to install Git, Node.js, NPM, MongoDB, PM2 and Nginx.
+A complete environment for Node.js applications with a backend MySQL database.
 
-###Details
-This PlayBook works with Ubuntu 14.04.5 LTS (Trusty Tahr) and Python 2.7
+## 📋 Variables
 
-#### How to use it
-1.- Install Ansible on your machine: http://docs.ansible.com/ansible/intro_installation.html
+Define these variables in `vars/default.yml`:
 
-2.- Update `hosts` file to add your remote server host.
-
-3.- Replace `my_remote_user` with your remote user on `main.yml` file.
-
-4.- Run this command in your local machine:
-```
-ansible-playbook -i hosts main.yml --ask-become-pass
-```
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `node_version` | The version of Node.js to install. | `16` |
+| `app_user` | The system user for the application. | `your_app_user` |
+| `mysql_root_password` | The root password for MySQL. | `your_mysql_root_password` |
+| `mysql_databases` | List of databases to create. | (See `vars/default.yml`) |
+| `mysql_users` | List of MySQL users and their privileges. | (See `vars/default.yml`) |
