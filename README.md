@@ -19,7 +19,14 @@ sudo apt update
 sudo apt install ansible sshpass
 ```
 
-### 2. Configuration
+### 2. Mandatory Configuration
+Disable Ansible's host key checking to ensure smooth automation when connecting to new servers:
+
+```bash
+export ANSIBLE_HOST_KEY_CHECKING=False
+```
+
+### 3. Usage Configuration
 1. **Inventory**: Edit the `hosts` file with your server IP and credentials.
    ```ini
    [web]
@@ -93,12 +100,6 @@ ansible-playbook -i hosts common/docker_ubuntu/playbook.yml
 ### Run a Specific Host from Inventory
 ```bash
 ansible-playbook -i hosts -l host0 common/setup_ubuntu/playbook.yml
-```
-
-### Advanced: Skipping Host Key Checking
-```bash
-export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook -i hosts stacks/lemp_ubuntu/playbook.yml
 ```
 
 ---
