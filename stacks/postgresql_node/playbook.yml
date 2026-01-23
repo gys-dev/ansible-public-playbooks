@@ -1,6 +1,6 @@
 - hosts: host0
   remote_user: root
-  become: yes
+  become: true
   become_method: sudo
 
   vars_files:
@@ -8,13 +8,13 @@
 
   tasks:
     # Install prerequisites
-    - include: tasks/prerequisites.yml
+    - include_tasks: tasks/prerequisites.yml
 
     # Install PostgreSQL
-    - include: tasks/postgresql.yml
+    - include_tasks: tasks/postgresql.yml
 
     # Install Node.js
-    - include: tasks/nodejs.yml
+    - include_tasks: tasks/nodejs.yml
 
     # Install Nginx
-    - include: tasks/nginx.yml
+    - include_tasks: tasks/nginx.yml

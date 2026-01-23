@@ -1,18 +1,18 @@
 - hosts: host0
   remote_user: root
-  become: yes
+  become: true
   become_method: sudo
   vars_files:
     - vars/default.yml
   tasks:
     #Install prerequisites
-    - include: tasks/prerequisites.yml
+    - include_tasks: tasks/prerequisites.yml
 
     #Install MongoDB
-    - include: tasks/mysql.yml
+    - include_tasks: tasks/mysql.yml
 
     #Install Node.js
-    - include: tasks/nodejs.yml
+    - include_tasks: tasks/nodejs.yml
 
     #Install Nginx
-    - include: tasks/nginx.yml
+    - include_tasks: tasks/nginx.yml

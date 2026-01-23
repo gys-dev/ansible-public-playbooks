@@ -9,20 +9,35 @@
 
   tasks:
     - name: Install prerequisites
-      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
-      loop: [ 'aptitude' ]
+      apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: latest
+        force_apt_get: true
+      loop: ["aptitude"]
 
-  #Apache Configuration
+    #Apache Configuration
     - name: Install LAMP Packages
-      apt: name={{ item }} update_cache=yes state=latest
-      loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php' ]
+      apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: latest
+      loop:
+        [
+          "apache2",
+          "mysql-server",
+          "python3-pymysql",
+          "php",
+          "php-mysql",
+          "libapache2-mod-php",
+        ]
 
     - name: Create document root
       file:
         path: "/var/www/{{ http_host }}"
         state: directory
         owner: "{{ app_user }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Set up Apache virtualhost
       template:
@@ -39,7 +54,7 @@
       when: disable_default
       notify: Reload Apache
 
-  # MySQL Configuration
+    # MySQL Configuration
     - name: Sets the root password
       mysql_user:
         name: root
@@ -48,8 +63,8 @@
 
     - name: Removes all anonymous user accounts
       mysql_user:
-        name: ''
-        host_all: yes
+        name: ""
+        host_all: true
         state: absent
         login_user: root
         login_password: "{{ mysql_root_password }}"
@@ -61,14 +76,14 @@
         login_user: root
         login_password: "{{ mysql_root_password }}"
 
-  # UFW Configuration
+    # UFW Configuration
     - name: "UFW - Allow HTTP on port {{ http_port }}"
       ufw:
         rule: allow
         port: "{{ http_port }}"
         proto: tcp
 
-  # PHP Info Page
+    # PHP Info Page
     - name: Sets Up PHP Info Page
       template:
         src: "files/info.php.j2"

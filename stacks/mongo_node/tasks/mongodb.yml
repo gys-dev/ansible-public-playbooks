@@ -2,7 +2,7 @@
   apt: 
     name: aptitude 
     state: latest 
-    update_cache: yes
+    update_cache: true
 
 - name: Import public key
   apt_key:
@@ -14,16 +14,16 @@
     filename: '/etc/apt/sources.list.d/mongodb-org-6.0.list'
     repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse'
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install mongoDB
   apt: 
     name: mongodb-org
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Ensure mongodb is running and and enabled to start automatically on reboots
   service: 
     name: mongod 
-    enabled: yes
+    enabled: true
     state: started

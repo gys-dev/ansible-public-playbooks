@@ -9,9 +9,13 @@
 
   tasks:
     - name: Install Prerequisites
-      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
+      apt:
+        name: aptitude
+        update_cache: true
+        state: latest
+        force_apt_get: true
 
-# Sudo Group Setup
+    # Sudo Group Setup
     - name: Make sure we have a 'wheel' group
       group:
         name: wheel
@@ -21,11 +25,11 @@
       lineinfile:
         path: /etc/sudoers
         state: present
-        regexp: '^%wheel'
-        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
-        validate: '/usr/sbin/visudo -cf %s'
+        regexp: "^%wheel"
+        line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+        validate: "/usr/sbin/visudo -cf %s"
 
-# User + Key Setup
+    # User + Key Setup
     - name: Create a new regular user with sudo privileges
       user:
         name: "{{ create_user }}"
@@ -45,17 +49,20 @@
       lineinfile:
         path: /etc/ssh/sshd_config
         state: present
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin prohibit-password'
+        regexp: "^#?PermitRootLogin"
+        line: "PermitRootLogin prohibit-password"
 
-# Install Packages
+    # Install Packages
     - name: Update apt
-      apt: update_cache=yes
+      apt:
+        update_cache: true
 
     - name: Install required system packages
-      apt: name={{ sys_packages }} state=latest
+      apt:
+        name: "{{ sys_packages }}"
+        state: latest
 
-# UFW Setup
+    # UFW Setup
     - name: UFW - Allow SSH connections
       ufw:
         rule: allow

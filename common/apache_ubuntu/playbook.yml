@@ -9,18 +9,25 @@
 
   tasks:
     - name: Install prerequisites
-      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
-      loop: [ 'aptitude' ]
+      apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: latest
+        force_apt_get: true
+      loop: ["aptitude"]
 
     - name: Install Apache
-      apt: name=apache2 update_cache=yes state=latest
+      apt:
+        name: apache2
+        update_cache: true
+        state: latest
 
     - name: Create document root
       file:
         path: "/var/www/{{ http_host }}"
         state: directory
         owner: "{{ app_user }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Copy index test page
       template:

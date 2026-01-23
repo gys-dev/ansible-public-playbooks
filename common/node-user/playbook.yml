@@ -1,6 +1,6 @@
 - hosts: host0
   remote_user: root
-  become: yes
+  become: true
   become_method: sudo
 
   vars_files:
@@ -14,7 +14,7 @@
         shell: /bin/bash
         create_home: true
         home: "/home/{{ app_user }}"
-      ignore_errors: yes
+      ignore_errors: true
 
     # Install Node.js
-    - include: tasks/nodejs.yml
+    - include_tasks: tasks/nodejs.yml

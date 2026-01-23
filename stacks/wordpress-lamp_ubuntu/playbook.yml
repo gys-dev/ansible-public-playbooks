@@ -9,67 +9,85 @@
 
   tasks:
     - name: Install prerequisites
-      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
-      tags: [ system ]
+      apt:
+        name: aptitude
+        update_cache: true
+        state: latest
+        force_apt_get: true
+      tags: [system]
 
     - name: Install LAMP Packages
-      apt: name={{ item }} update_cache=yes state=latest
-      loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php' ]
-      tags: [ system ]
+      apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: latest
+      loop:
+        [
+          "apache2",
+          "mysql-server",
+          "python3-pymysql",
+          "php",
+          "php-mysql",
+          "libapache2-mod-php",
+        ]
+      tags: [system]
 
     - name: Install PHP Extensions
-      apt: name={{ item }} update_cache=yes state=latest
+      apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: latest
       loop: "{{ php_modules }}"
-      tags: [ system ]
+      tags: [system]
 
-  # Apache Configuration
+    # Apache Configuration
     - name: Create document root
       file:
         path: "/var/www/{{ http_host }}"
         state: directory
         owner: "www-data"
         group: "www-data"
-        mode: '0755'
-      tags: [ apache ]
+        mode: "0755"
+      tags: [apache]
 
     - name: Set up Apache VirtualHost
       template:
         src: "files/apache.conf.j2"
         dest: "/etc/apache2/sites-available/{{ http_conf }}"
       notify: Reload Apache
-      tags: [ apache ]
+      tags: [apache]
 
     - name: Enable rewrite module
       shell: /usr/sbin/a2enmod rewrite
       notify: Reload Apache
-      tags: [ apache ]
+      tags: [apache]
 
     - name: Enable new site
       shell: /usr/sbin/a2ensite {{ http_conf }}
       notify: Reload Apache
-      tags: [ apache ]
+      tags: [apache]
 
     - name: Disable default Apache site
       shell: /usr/sbin/a2dissite 000-default.conf
       notify: Restart Apache
-      tags: [ apache ]
+      tags: [apache]
 
-  # MySQL Configuration
+    # MySQL Configuration
     - name: Set the root password
       mysql_user:
         name: root
         password: "{{ mysql_root_password }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
-      tags: [ mysql, mysql-root ]
+      tags: [mysql, mysql-root]
 
     - name: Remove all anonymous user accounts
       mysql_user:
-        name: ''
-        host_all: yes
+        name: ""
+        host_all: true
         state: absent
         login_user: root
         login_password: "{{ mysql_root_password }}"
-      tags: [ mysql ]
+      tags: [mysql]
 
     - name: Remove the MySQL test database
       mysql_db:
@@ -77,7 +95,7 @@
         state: absent
         login_user: root
         login_password: "{{ mysql_root_password }}"
-      tags: [ mysql ]
+      tags: [mysql]
 
     - name: Creates database for WordPress
       mysql_db:
@@ -85,7 +103,7 @@
         state: present
         login_user: root
         login_password: "{{ mysql_root_password }}"
-      tags: [ mysql ]
+      tags: [mysql]
 
     - name: Create MySQL user for WordPress
       mysql_user:
@@ -95,47 +113,47 @@
         state: present
         login_user: root
         login_password: "{{ mysql_root_password }}"
-      tags: [ mysql ]
+      tags: [mysql]
 
-  # UFW Configuration
+    # UFW Configuration
     - name: "UFW - Allow HTTP on port {{ http_port }}"
       ufw:
         rule: allow
         port: "{{ http_port }}"
         proto: tcp
-      tags: [ system ]
+      tags: [system]
 
-  # WordPress Configuration
+    # WordPress Configuration
     - name: Download and unpack latest WordPress
       unarchive:
         src: https://wordpress.org/latest.tar.gz
         dest: "/var/www/{{ http_host }}"
-        remote_src: yes
+        remote_src: true
         creates: "/var/www/{{ http_host }}/wordpress"
-      tags: [ wordpress ]
+      tags: [wordpress]
 
     - name: Set ownership
       file:
         path: "/var/www/{{ http_host }}"
         state: directory
-        recurse: yes
+        recurse: true
         owner: www-data
         group: www-data
-      tags: [ wordpress ]
+      tags: [wordpress]
 
     - name: Set permissions for directories
       shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
-      tags: [ wordpress ]
+      tags: [wordpress]
 
     - name: Set permissions for files
       shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
-      tags: [ wordpress ]
+      tags: [wordpress]
 
     - name: Set up wp-config
       template:
         src: "files/wp-config.php.j2"
         dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
-      tags: [ wordpress ]
+      tags: [wordpress]
 
   handlers:
     - name: Reload Apache

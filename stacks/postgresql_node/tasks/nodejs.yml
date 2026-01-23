@@ -9,12 +9,17 @@
   become_method: su
 
 - name: Download the nvm(node version manager) install script
-  get_url: url=https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh dest={{ temp_folder }}/install.sh
+  get_url:
+    url: https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh
+    dest: "{{ temp_folder }}/install.sh"
   become_user: "{{ app_user }}"
   become_method: su
 
 - name: Execute the nvm install script
-  shell: bash install.sh chdir={{ temp_folder }} executable=/bin/bash
+  shell: bash install.sh
+  args:
+    chdir: "{{ temp_folder }}"
+    executable: /bin/bash
   become_user: "{{ app_user }}"
   become_method: su
 
@@ -30,7 +35,7 @@
   ansible.builtin.lineinfile:
     path: ~/.bashrc
     line: source ~/.nvm/nvm.sh # This will make sure Node is on the user's PATH
-    create: yes
+    create: true
   become_user: "{{ app_user }}"
   become_method: su
 

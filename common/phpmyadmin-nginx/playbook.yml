@@ -5,7 +5,7 @@
 
 - hosts: host0
   remote_user: root
-  become: yes
+  become: true
   become_method: sudo
   vars_files:
     - vars/default.yml
@@ -14,7 +14,7 @@
       apt:
         name: '{{ phpmyadmin_php_fpm_socket }}'
         state: present
-        update_cache: yes
+        update_cache: true
     - name: Install phpmyadmin
       import_role:
         name: shakahl.ansible-phpmyadmin
