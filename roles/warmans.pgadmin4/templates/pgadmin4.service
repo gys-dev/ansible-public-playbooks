@@ -1,0 +1,9 @@
+[Unit]
+Description=Pgadmin4 Server
+
+[Service]
+ExecStart=/usr/bin/python3 {{ pgadmin4_python2_dist_dir }}/pgadmin4/pgAdmin4.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

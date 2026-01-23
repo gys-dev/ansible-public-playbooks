@@ -1,0 +1,13 @@
+galaxy_info:
+  author: warmans
+  description: pgadmin4 server role
+  company:
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+  - name: Debian
+    versions:
+    - jessie
+  galaxy_tags: ['pgadmin4', 'postgresql']
+
+dependencies: []

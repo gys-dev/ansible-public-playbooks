@@ -1,0 +1,141 @@
+- name: Create pgadmin4 user
+  user:
+    name: '{{ app_user }}'
+    shell: /bin/bash
+    create_home: true
+    home: "/home/{{app_user}}"
+  ignore_errors: yes
+
+- name: Set Python version to a variable
+  set_fact:
+    python_version: "{{ ansible_python_version | regex_replace('(\\d+\\.\\d+).*', '\\1') }}"
+
+- name: Set venv path to a variable
+  set_fact:
+    venv_path: "/home/{{ app_user }}/venvs/pgenv" 
+
+- name: Create pg directory directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /var/lib/pgadmin4/sessions
+    - /var/lib/pgadmin4/storage
+    - /var/log/pgadmin4
+
+- name: Set ownership for directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    recurse: yes
+  with_items:
+    - { path: '/var/lib/pgadmin4', owner: '{{ app_user }}', group: '{{ app_user }}' }
+    - { path: '/var/log/pgadmin4', owner: '{{ app_user }}', group: '{{ app_user }}' }
+
+- name: install python dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - python3-pip
+    # - python-dev
+    - libgmp3-dev
+    - libpq-dev
+    - libssl-dev
+    - libffi-dev
+    - python3-openssl
+    - python3-virtualenv
+    - python3-pexpect
+
+- name: Manually create the initial virtualenv
+  command:
+    cmd: virtualenv {{ venv_path }} -p python3
+    creates: "{{ venv_path }}"
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: install pip dependencies
+  pip: name={{ item }} state=present virtualenv={{ venv_path }}
+  with_items:
+    - pexpect
+    - pyopenssl
+    - flask
+    - gunicorn
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: upgrade pyopenssl 
+  pip: name=pyopenssl state=latest virtualenv={{ venv_path }}
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: install pgadmin4
+  pip: name={{ pgadmin4_pip_download }} state=present virtualenv={{ venv_path }}
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: create local config
+  shell: cd {{ venv_path }}/lib/python{{ python_version }}/site-packages/pgadmin4 && cp config.py config_local.py
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: update local config
+  shell: sed -i "{{ item }}" {{ venv_path }}/lib/python{{ python_version }}/site-packages/pgadmin4/config_local.py
+  with_items:
+    - "s/DEFAULT_SERVER = .*/DEFAULT_SERVER = '{{ pgadmin4_server_bind }}'/"
+    - "s/DEFAULT_SERVER_PORT.*/DEFAULT_SERVER_PORT = {{ pgadmin4_server_port }}/"
+    - "s/CSRF_SESSION_KEY.*/CSRF_SESSION_KEY = '{{ pgadmin4_server_csrf_key }}'/"
+    - "s/SECRET_KEY.*/SECRET_KEY = '{{ pgadmin4_server_secret_key }}'/"
+    - "s/SECURITY_PASSWORD_SALT.*/SECURITY_PASSWORD_SALT = '{{ pgadmin4_server_password_salt }}'/"
+    - "s/UPGRADE_CHECK_ENABLED.*/UPGRADE_CHECK_ENABLED = {{ pgadmin4_upgrade_check_enabled }}/"
+    - "s/MAIL_SERVER.*/MAIL_SERVER = '{{ pgadmin4_mail_server}}'/"
+    - "s/MAIL_PORT.*/MAIL_PORT = {{ pgadmin4_mail_port }}/"
+    - "s/MAIL_USE_SSL.*/MAIL_USE_SSL = {{ pgadmin4_mail_use_ssl }}/"
+    - "s/MAIL_USERNAME.*/MAIL_USERNAME = '{{ pgadmin4_mail_username }}'/"
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: copy excute script 
+  template: src=config.sh dest=~/
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: Set ownership for directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    recurse: yes
+  with_items:
+    - { path: '/var/log/pgadmin', owner: '{{ app_user }}', group: '{{ app_user }}' }
+    - { path: '/var/lib/pgadmin', owner: '{{ app_user }}', group: '{{ app_user }}' }
+
+- name: setup pgadmin
+  become: true
+  expect:
+    # /pgAdmin4.py
+    command: "{{ venv_path }}/bin/python{{ python_version }} {{ venv_path }}/lib/python{{ python_version }}/site-packages/pgadmin4/setup.py"
+    creates: ~/.pgadmin
+    echo: true
+    responses:
+      'Email address': "{{ pgadmin4_initial_user_email }}"
+      '(?i).*password': "{{ pgadmin4_initial_user_password }}"
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: Execute pgadmin4 in the background
+  shell: "{{ venv_path }}/bin/gunicorn --bind unix:/tmp/pgadmin4.sock --workers=1 --threads=25 --chdir {{ venv_path }}/lib/python{{ python_version }}/site-packages/pgadmin4 pgAdmin4:app --daemon"
+  async: 0
+  poll: 0
+  become_user: "{{ app_user }}"
+  become_method: su
+
+- name: Start pgadmin script
+  cron:
+    name: "start pgadmin script"
+    special_time: reboot
+    job: "{{ venv_path }}/bin/gunicorn --bind unix:/tmp/pgadmin4.sock --workers=1 --threads=25 --chdir {{ venv_path }}/lib/python{{ python_version }}/site-packages/pgadmin4 pgAdmin4:app"
+  become_user: "{{ app_user }}"
+  become_method: su

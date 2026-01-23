@@ -1,0 +1,16 @@
+---
+pgadmin4_python2_dist_dir: /usr/local/lib/python2.7/dist-packages
+pgadmin4_pip_download: https://ftp.postgresql.org/pub/pgadmin3/pgadmin4/v1.0-beta2/pip/pgadmin4-1.0b2-py2-none-any.whl
+pgadmin4_server_bind: 0.0.0.0
+pgadmin4_server_port: 5050
+pgadmin4_server_csrf_key: SuperSecret1
+pgadmin4_server_secret_key: SuperSecret2
+pgadmin4_server_password_salt: SuperSecret3
+pgadmin4_initial_user_email: admin@admin.com
+pgadmin4_initial_user_password: admin
+pgadmin4_upgrade_check_enabled: true
+pgadmin4_mail_server: smtp.gmail.com
+pgadmin4_mail_port: 465
+pgadmin4_mail_use_ssl: true
+pgadmin4_mail_username: username
+pgadmin4_mail_password: SuperSecret
