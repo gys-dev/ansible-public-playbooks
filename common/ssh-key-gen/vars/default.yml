@@ -1,0 +1,2 @@
+app_user: myapp
+ssh_key_filename: id_rsa

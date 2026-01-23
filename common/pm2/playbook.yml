@@ -1,0 +1,48 @@
+# 1. cd to directory
+# 2. Run Pm2 script
+# 3. Save script to file
+# 4. Config runscript for startup 
+
+- hosts: host0
+  vars_files:
+    - vars/default.yml
+  tasks:
+
+    # - name: PM2 | Find path pm2
+    #   ansible.builtin.shell: "which pm2"
+    #   register: pm2_dir
+    #   failed_when: pm2_dir.rc != 1 and pm2_dir.rc != 0
+
+    #   environment:
+    #     PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+
+
+    # - name: Debug
+    #   debug:
+    #     msg: " {{ pm2_dir }} "
+
+    - name: PM2 | Run start pm2 script
+      ansible.builtin.shell: |
+        source $HOME/.nvm/nvm.sh
+        PORT={{ node_port }} {{ pm2_deploy_script }}
+      args:
+        executable: /bin/bash
+        chdir: "$HOME/{{ app_run_directory }}"
+
+    - name: PM2 | Save script for next restart
+      ansible.builtin.shell: |
+        source $HOME/.nvm/nvm.sh
+        pm2 save
+      args:
+        executable: /bin/bash
+        chdir: "$HOME/{{ app_run_directory }}"
+    
+    # run script not work
+    - name: CronTab | Persist all app script pm2
+      ansible.builtin.cron:
+        name: "Pm2 job for reboot"
+        special_time: reboot
+        job: /bin/bash -c "pm2 update" >> /home/{{ app_user }}/startup.log
+        state: present
+
+

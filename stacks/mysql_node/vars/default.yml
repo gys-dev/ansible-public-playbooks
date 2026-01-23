@@ -1,0 +1,17 @@
+temp_folder: ~/tmp
+node_version: 16
+
+app_user: your_app_user
+app_password: your_app_password
+
+mysql_enabled_on_startup: true
+mysql_root_password: your_mysql_root_password
+mysql_databases:
+  - name: db_app
+    encoding: latin1
+    collation: latin1_general_ci
+mysql_users:
+  - name: db_user
+    host: "%"
+    password: your_db_password
+    priv: "db_app.*:ALL"

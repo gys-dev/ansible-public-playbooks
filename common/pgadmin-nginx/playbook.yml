@@ -1,0 +1,8 @@
+- hosts: host0
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+    - vars/default.yml
+  roles:
+    - { role: warmans.pgadmin4 }

@@ -1,0 +1,5 @@
+temp_folder: ~/tmp
+node_version: 20
+
+app_user: your_app_user
+app_password: your_app_password

@@ -1,0 +1,31 @@
+- name: Install git
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+
+- name: Add repository
+  apt_repository:
+    filename: '/etc/apt/sources.list.d/focal-security.list'
+    repo: 'deb http://security.ubuntu.com/ubuntu focal-security main'
+    state: present
+    
+- name: Install libssl
+  apt:
+    name: libssl1.1
+    state: present
+    update_cache: yes
+
+- name: SERVER | Install other dependencies
+  apt: name={{ item }} state=latest
+  with_items:
+    - curl
+
+- name: Create app_user user
+  user:
+    name: '{{ app_user }}'
+    password: "{{ app_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    create_home: true
+    home: "/home/{{app_user}}"
+  ignore_errors: yes

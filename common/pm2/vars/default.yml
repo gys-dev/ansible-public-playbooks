@@ -1,0 +1,7 @@
+---
+app_user: your_app_user
+
+node_port: 3300
+app_run_directory: pango-web-api
+app_name: pango-web-api
+pm2_deploy_script: pm2 start  -i 2 --name "{{ app_name }}" node dist/apps/user/main.js

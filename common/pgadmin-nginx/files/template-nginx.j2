@@ -1,0 +1,12 @@
+server {
+    server_name {{ server_name }}
+    access_log /var/log/nginx/app.log;
+    error_log /var/log/nginx/app.error.log;
+    
+    location / {
+        proxy_pass http://unix:/tmp/pgadmin4.sock;
+        include proxy_params;
+    }
+       
+    listen 80;
+}

@@ -1,0 +1,10 @@
+# Override if needed. This is set platform-specific in the vars dir if not set.
+# phpmyadmin_config_file: /etc/phpmyadmin/config.inc.php
+phpmyadmin_mysql_host: localhost
+phpmyadmin_mysql_port: ""
+phpmyadmin_mysql_socket: ""
+phpmyadmin_mysql_connect_type: tcp
+phpmyadmin_mysql_user: root
+
+# Password should be root password
+phpmyadmin_mysql_password: "your_mysql_root_password"

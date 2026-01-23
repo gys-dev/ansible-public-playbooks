@@ -1,0 +1,20 @@
+# Todo
+# 1. Install php8.1-fpm as a config
+# 2. Config path unix:/run/php/php8.1-fpm.sock
+# 3. Config site flow as path include /etc/nginx/global.d/*.conf (user choices, manual import by hand);
+
+- hosts: host0
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+    - vars/default.yml
+  tasks:
+    - name: Install php-fpm sock
+      apt:
+        name: '{{ phpmyadmin_php_fpm_socket }}'
+        state: present
+        update_cache: yes
+    - name: Install phpmyadmin
+      import_role:
+        name: shakahl.ansible-phpmyadmin

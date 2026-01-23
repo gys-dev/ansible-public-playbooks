@@ -1,0 +1,29 @@
+- hosts: host0
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+    - vars/default.yml
+  tasks:
+    - name: Nginx | Add new site config
+      import_role:
+        name: geerlingguy.nginx
+    
+    - name: Cerbot | Install certbot
+      include_role:
+        name: certbot_nginx
+        tasks_from: main.yml
+
+    - name: Cerbot | Enable SSL for this site
+      include_role:
+        name: certbot_nginx
+        tasks_from: certificate.yml
+      with_items: "{{ domain_names }}"
+      loop_control:
+        loop_var: domain_name
+      vars:
+        domain_names: 
+          - '{{ server_name }}'
+        letsencrypt_email: ducyk41cntt@gmail.com
+        certbot_nginx_cert_name: '{{ server_name }}'
+        

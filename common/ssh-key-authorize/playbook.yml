@@ -1,0 +1,10 @@
+---
+- name: Configure passwordless ssh authentication on a remote machine
+  hosts: host0
+  vars_files:
+    - vars/default.yml
+  tasks:
+    - authorized_key:
+        user: '{{ app_user }}'
+        state: present
+        key: "{{ lookup('file', '/Users/tranducy/Documents/Project/ansible-scripts/common/ssh-key-authorize/files/id_rsa.pub') }}"

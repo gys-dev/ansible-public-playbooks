@@ -1,0 +1,11 @@
+nginx_vhost_template: "files/vhost.conf.j2"
+nginx_remove_default_vhost: true
+
+node_port: 3300
+server_name: example.com
+nginx_vhosts:
+  - listen: "80"
+    server_name: "{{ server_name }}"
+    server_name_redirect: "www.{{ server_name }}"
+    state: "present"
+    filename: "{{ server_name }}.conf"

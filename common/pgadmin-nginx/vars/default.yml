@@ -1,0 +1,17 @@
+#app user
+app_user: pgadmin4
+
+# python3 -m site
+
+pgadmin4_python2_dist_dir: /usr/local/lib/python3.11/dist-packages
+# https://www.postgresql.org/ftp/pgadmin/pgadmin4
+pgadmin4_pip_download: https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.0/pip/pgadmin4-8.0-py3-none-any.whl
+pgadmin4_server_bind: 0.0.0.0
+pgadmin4_server_port: 5050
+pgadmin4_server_csrf_key: your_secret_key
+pgadmin4_server_secret_key: your_secret_key
+pgadmin4_server_password_salt: your_password_salt
+pgadmin4_mail_username: admin@example.com
+pgadmin4_mail_password: your_mail_password
+pgadmin4_initial_user_email: admin@example.com
+pgadmin4_initial_user_password: your_initial_password
