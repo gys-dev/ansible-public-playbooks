@@ -1,0 +1,23 @@
+{
+  "name": "ansible-script-public",
+  "version": "1.0.0",
+  "description": "A comprehensive collection of production-ready Ansible playbooks and roles designed for automated server provisioning and application stack orchestration. Primarily optimized for **Ubuntu 18.04/20.04+**.",
+  "main": "mcp-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gys-dev/ansible-public-playbooks.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gys-dev/ansible-public-playbooks/issues"
+  },
+  "homepage": "https://github.com/gys-dev/ansible-public-playbooks#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  }
+}

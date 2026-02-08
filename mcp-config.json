@@ -1,0 +1,144 @@
+{
+  "name": "ansible-script-mcp",
+  "version": "1.0.0",
+  "displayName": "Ansible Script MCP",
+  "description": "MCP server for executing Ansible playbooks and collecting system information",
+  "tools": [
+    {
+      "name": "list-playbooks",
+      "description": "List all available Ansible playbooks",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["common", "stacks", "roles"],
+            "description": "Filter by playbook category"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get-playbook-info",
+      "description": "Get detailed information about a specific playbook",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "playbook_path": {
+            "type": "string",
+            "description": "Path to the playbook file"
+          }
+        },
+        "required": ["playbook_path"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get-variable-schema",
+      "description": "Get the variable schema for a playbook",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "playbook_path": {
+            "type": "string",
+            "description": "Path to the playbook file"
+          }
+        },
+        "required": ["playbook_path"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "execute-playbook",
+      "description": "Execute an Ansible playbook with provided variables",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "playbook_path": {
+            "type": "string",
+            "description": "Path to the playbook file"
+          },
+          "inventory": {
+            "type": "string",
+            "description": "Path to inventory file"
+          },
+          "variables": {
+            "type": "object",
+            "description": "Variables to pass to the playbook"
+          },
+          "limit": {
+            "type": "string",
+            "description": "Limit execution to specific hosts"
+          }
+        },
+        "required": ["playbook_path"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get-host-info",
+      "description": "Get information about hosts in the inventory",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inventory_path": {
+            "type": "string",
+            "description": "Path to inventory file"
+          }
+        },
+        "required": ["inventory_path"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get-system-info",
+      "description": "Collect system information from a host",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "Host to collect information from"
+          },
+          "user": {
+            "type": "string",
+            "description": "User to connect as"
+          }
+        },
+        "required": ["host"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "suggest-playbook",
+      "description": "Suggest the most appropriate playbook based on user requirements",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "requirements": {
+            "type": "string",
+            "description": "User requirements or goals"
+          }
+        },
+        "required": ["requirements"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "resources": {
+    "scripts": [
+      "scripts/list-playbooks.js",
+      "scripts/get-playbook-info.js",
+      "scripts/get-variable-schema.js",
+      "scripts/execute-playbook.js",
+      "scripts/get-host-info.js",
+      "scripts/get-system-info.js",
+      "scripts/suggest-playbook.js"
+    ]
+  },
+  "connections": {
+    "stdio": {}
+  }
+}
