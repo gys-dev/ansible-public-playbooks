@@ -1,29 +1,31 @@
-- name: Install aptitude using apt
-  apt: 
-    name: aptitude 
-    state: latest 
+---
+- name: MongoDB | Download MongoDB GPG key
+  ansible.builtin.get_url:
+    url: https://www.mongodb.org/static/pgp/server-8.0.asc
+    dest: /usr/share/keyrings/mongodb-server-8.0.asc
+    mode: "0644"
+
+- name: MongoDB | De-armor GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /usr/share/keyrings/mongodb-server-8.0.asc > /usr/share/keyrings/mongodb-server-8.0.gpg
+  args:
+    creates: /usr/share/keyrings/mongodb-server-8.0.gpg
+
+- name: MongoDB | Add MongoDB repository
+  ansible.builtin.apt_repository:
+    filename: mongodb-org-8.0
+    repo: "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse"
+    state: present
     update_cache: true
 
-- name: Import public key
-  apt_key:
-    url: 'https://www.mongodb.org/static/pgp/server-6.0.asc'
-    state: present
-
-- name: Add repository
-  apt_repository:
-    filename: '/etc/apt/sources.list.d/mongodb-org-6.0.list'
-    repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse'
-    state: present
-    update_cache: true
-
-- name: Install mongoDB
-  apt: 
+- name: MongoDB | Install MongoDB
+  apt:
     name: mongodb-org
     state: present
     update_cache: true
 
-- name: Ensure mongodb is running and and enabled to start automatically on reboots
-  service: 
-    name: mongod 
+- name: MongoDB | Ensure service is running and enabled
+  service:
+    name: mongod
     enabled: true
     state: started

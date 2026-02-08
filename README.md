@@ -104,6 +104,53 @@ ansible-playbook -i hosts -l host0 common/setup_ubuntu/playbook.yml
 
 ---
 
+## 🤖 MCP Server Configuration
+
+This project includes a Model Context Protocol (MCP) server that allows AI agents (like Claude or Antigravity) to browse playbooks, extract variable schemas, and execute Ansible tasks directly.
+
+### 1. Installation
+Ensure you have installed the dependencies in the project root:
+```bash
+npm install
+```
+
+### 2. Config
+
+Add this to your Claude Desktop configuration (e.g., `~/Library/Application\ Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+
+```json
+{
+  "mcpServers": {
+    "ansible-script-mcp": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/ansible-script-public/mcp-server.js"],
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" 
+      }
+    }
+  }
+}
+```
+
+> **Note on Cross-Platform Compatibility:**
+> - **macOS/Linux**: Use `:` as the path separator in `env.PATH`.
+> - **Windows**: Use `;` as the separator and ensure paths like `C:\\Program Files\\nodejs\\` are included. 
+> - **Ansible on Windows**: Since Ansible requires a Unix-like environment, it is highly recommended to run this MCP server within **WSL (Windows Subsystem for Linux)** for full compatibility.
+> - **Automatic Resolution**: The MCP server now automatically attempts to include standard binary paths (like `/usr/local/bin`) if they are missing from the environment.
+
+#### 🛠 Available Tools:
+| Tool | Description |
+| :--- | :--- |
+| `list-playbooks` | Lists all available playbooks (common, stacks, roles). |
+| `get-playbook-info` | Gets detailed info (tasks, content) for a playbook. |
+| `get-variable-schema`| Extracts required variables and their types. |
+| `execute-playbook` | Executes a playbook with provided variables/limit. |
+| `get-host-info` | Reads the current inventory hosts. |
+| `get-system-info` | Collects system facts from a specific host. |
+| `suggest-playbook` | Suggests appropriate playbooks based on your requirements. |
+
+---
+
 ## 📌 Maintenance Notes
 
 This project supports two execution formats:

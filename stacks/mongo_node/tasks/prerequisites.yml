@@ -1,29 +1,15 @@
-- name: Install git
+---
+- name: Prerequisites | Install common packages
   apt:
-    name: git
+    name:
+      - git
+      - curl
+      - gnupg
+      - software-properties-common
     state: present
     update_cache: true
 
-- name: Add repository
-  apt_repository:
-    filename: "/etc/apt/sources.list.d/focal-security.list"
-    repo: "deb http://security.ubuntu.com/ubuntu focal-security main"
-    state: present
-
-- name: Install libssl
-  apt:
-    name: libssl1.1
-    state: present
-    update_cache: true
-
-- name: SERVER | Install other dependencies
-  apt:
-    name: "{{ item }}"
-    state: latest
-  loop:
-    - curl
-
-- name: Create app_user user
+- name: Prerequisites | Create app_user user
   user:
     name: "{{ app_user }}"
     password: "{{ app_password | password_hash('sha512') }}"
@@ -31,3 +17,11 @@
     create_home: true
     home: "/home/{{ app_user }}"
   ignore_errors: true
+
+- name: Prerequisites | Ensure app_user home permissions
+  file:
+    path: "/home/{{ app_user }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0755"

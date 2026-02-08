@@ -1,68 +1,44 @@
-- name: Create temp download directory
+---
+- name: Node.js | Create temp download directory
   ansible.builtin.file:
     path: "{{ temp_folder }}"
     state: directory
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
-    mode: 0755
-  become_user: "{{ app_user }}"
-  become_method: su
+    mode: "0755"
 
-- name: Download the nvm(node version manager) install script
+- name: Node.js | Download NVM install script
   get_url:
-    url: https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh
-    dest: "{{ temp_folder }}/install.sh"
+    url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh
+    dest: "{{ temp_folder }}/nvm_install.sh"
+    mode: "0755"
   become_user: "{{ app_user }}"
-  become_method: su
 
-- name: Execute the nvm install script
-  shell: bash install.sh
-  args:
-    chdir: "{{ temp_folder }}"
-    executable: /bin/bash
-  become_user: "{{ app_user }}"
-  become_method: su
-
-#print in shell and take to out put into nvm_dir
-- name: Register the NVM_DIR
-  shell: echo $NVM_DIR
-  register: nvm_dir
-  become_user: "{{ app_user }}"
-  become_method: su
-
-# import nvm in shell
-- name: Setup .bashrc
-  ansible.builtin.lineinfile:
-    path: ~/.bashrc
-    line: source ~/.nvm/nvm.sh # This will make sure Node is on the user's PATH
-    create: true
-  become_user: "{{ app_user }}"
-  become_method: su
-
-- name: Install node version
-  ansible.builtin.shell: |
-    source ~/.nvm/nvm.sh && nvm install {{node_version}}
+- name: Node.js | Install NVM
+  shell: bash "{{ temp_folder }}/nvm_install.sh"
   args:
     executable: /bin/bash
-    chdir: "$HOME"
-    creates: "$HOME/.nvm/versions/node/v{{node_version}}"
-  loop:
-    - 14.15.0
+    creates: "/home/{{ app_user }}/.nvm/nvm.sh"
   become_user: "{{ app_user }}"
-  become_method: su
 
-- name: Specified node version using the nvm command and set it as default
+- name: Node.js | Install Node version {{ node_version }}
   shell: |
-    ~/.nvm/nvm.sh run {{node_version}} --version && ~/.nvm/nvm.sh alias default {{node_version}}
+    source ~/.nvm/nvm.sh && nvm install {{ node_version }} && nvm alias default {{ node_version }}
+  args:
+    executable: /bin/bash
+    creates: "/home/{{ app_user }}/.nvm/versions/node/v{{ node_version }}*"
   become_user: "{{ app_user }}"
-  become_method: su
 
-- name: Install yarn, pm2
-  ansible.builtin.shell: |
-    source $HOME/.nvm/nvm.sh
-    npm install --global yarn pm2
+- name: Node.js | Install global packages
+  shell: |
+    source ~/.nvm/nvm.sh && npm install --global yarn pm2
   args:
     executable: /bin/bash
   become_user: "{{ app_user }}"
-  become_method: su
-  remote_user: "{{ app_user }}"
+
+- name: Node.js | Add NVM to .bashrc
+  lineinfile:
+    path: "/home/{{ app_user }}/.bashrc"
+    line: 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    state: present
+  become_user: "{{ app_user }}"
