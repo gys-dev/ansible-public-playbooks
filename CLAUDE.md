@@ -125,3 +125,167 @@ ansible-playbook -i hosts playbook.yml -v
 - Community roles in `roles/geerlingguy.*`
 - Custom roles in `roles/` directory
 - Dependencies managed through `meta/main.yml`
+
+## Custom Claude Code Skills
+
+This repository includes custom Claude Code skills for enhanced website deployment functionality.
+
+### Available Skills
+
+#### deploy-website (Basic)
+- **Purpose**: Basic production website deployment
+- **Features**: Environment setup, dependency management, basic serving
+- **Usage**: `/claude deploy-website --source /path/to/project --domain example.com --ssl`
+- **When to use**: Simple deployments without complex stack requirements
+
+#### deploy-website-enhanced (Recommended)
+- **Purpose**: Enhanced production website deployment with full Ansible integration
+- **Features**: Complete system configuration, stack support, database integration, advanced monitoring
+- **Usage**: `/claude deploy-website-enhanced --source /path/to/project --domain example.com --stack lamp --database --ssl`
+- **When to use**: Production deployments requiring full infrastructure setup
+
+### Skill Installation
+
+The skills are automatically installed when running the main installation script:
+
+```bash
+./install-claude-skills.sh
+./install-skills.sh
+```
+
+### Skill Integration with Ansible Infrastructure
+
+The enhanced skill fully integrates with the existing Ansible infrastructure:
+
+#### Reused Components
+- **System Setup**: `common/setup_ubuntu/playbook.yml`
+- **User Management**: `common/node-user/playbook.yml`
+- **Service Management**: `common/pm2/playbook.yml`, `common/nginx-site/playbook.yml`
+- **Database Setup**: Playbooks from `stacks/` directory
+- **Security**: SSH key management, firewall configuration
+
+#### Enhanced Features
+- **Dynamic Configuration**: Automatically updates Ansible variables based on deployment parameters
+- **Stack Detection**: Automatically finds and uses appropriate stack playbooks
+- **Environment Variables**: Creates and manages environment files for different application types
+- **Port Configuration**: Auto-detects and configures application ports
+- **SSL Integration**: Enhanced SSL certificate management with Let's Encrypt
+
+### Usage Examples
+
+#### Basic Node.js Deployment
+```bash
+# Basic deployment
+/claude deploy-website --source /var/www/myapp --domain myapp.com --ssl
+
+# Enhanced deployment with monitoring
+/claude deploy-website-enhanced --source /var/www/myapp --domain myapp.com --ssl --pm2 --nginx --debug
+```
+
+#### LAMP Stack Deployment
+```bash
+# Enhanced LAMP stack with MySQL
+/claude deploy-website-enhanced --source /var/www/myapp --domain myapp.com --ssl --stack lamp --database --database_type mysql
+```
+
+#### Python/Django Deployment
+```bash
+# Enhanced Python deployment with PostgreSQL
+/claude deploy-website-enhanced --source /var/www/myapp --domain myapp.com --ssl --app_type python --database --database_type postgresql
+```
+
+#### MongoDB + Node.js Stack
+```bash
+# Enhanced MongoDB + Node.js stack
+/claude deploy-website-enhanced --source /var/www/myapp --domain myapp.com --ssl --stack mongo_node --database --database_type mongo
+```
+
+### Skill Architecture
+
+The skills are structured according to the Claude Code Agent Skills open standard:
+
+```
+~/.claude/skills/
+├── deploy-website/
+│   ├── SKILL.md              # Skill definition with YAML frontmatter
+│   ├── register.sh           # Registration script
+│   └── scripts/
+│       └── deploy.py         # Implementation script
+├── deploy-website-enhanced/
+│   ├── SKILL.md              # Skill definition with YAML frontmatter
+│   ├── register.sh           # Registration script
+│   └── scripts/
+│       └── deploy.py         # Implementation script
+```
+
+### Skill Registration
+
+Skills can be registered manually or through the automated scripts:
+
+```bash
+# Manual registration
+claude skill register ~/.claude/skills/deploy-website/SKILL.md
+claude skill register ~/.claude/skills/deploy-website-enhanced/SKILL.md
+
+# Or use the provided scripts
+~/.claude/skills/deploy-website/register.sh
+~/.claude/skills/deploy-website-enhanced/register.sh
+```
+
+### Skill Knowledge
+
+When using these skills, Claude has knowledge of:
+
+1. **Ansible Infrastructure**: Full understanding of the repository's Ansible playbooks and roles
+2. **Stack Configurations**: LAMP, LEMP, Node.js, Python, and MongoDB stacks
+3. **Database Integration**: MySQL, PostgreSQL, and MongoDB setup procedures
+4. **Security Practices**: SSH key management, firewall configuration, SSL setup
+5. **Deployment Patterns**: Environment detection, port configuration, process management
+6. **Troubleshooting**: Common issues and their resolutions
+
+### Integration with Development Workflow
+
+The skills integrate seamlessly with the existing development workflow:
+
+1. **Environment Detection**: Automatically detects application type (Node.js, Python, PHP)
+2. **Stack Selection**: Chooses appropriate stack playbooks based on parameters
+3. **Configuration Management**: Updates Ansible variables and templates dynamically
+4. **Deployment Automation**: Handles the complete deployment pipeline
+5. **Monitoring Setup**: Configures logging and monitoring for deployed applications
+
+### Advanced Features
+
+#### Dynamic Context Injection
+Skills use dynamic context injection to fetch real-time data:
+```yaml
+# Example from deploy-website-enhanced skill
+---
+name: deploy-website-enhanced
+description: Enhanced production website deployment...
+context: fork
+agent: Explore
+allowed-tools: Bash(gh *)
+---
+
+## Pull request context
+- PR diff: !`gh pr diff`
+- PR comments: !`gh pr view --comments`
+- Changed files: !`gh pr diff --name-only`
+```
+
+#### Subagent Execution
+Skills can run in isolated subagent contexts for complex operations:
+```yaml
+# Example from deploy-website-enhanced skill
+context: fork
+agent: Explore
+```
+
+### Security Considerations
+
+The skills follow security best practices:
+- **SSH Security**: Key-based authentication, disabled root login
+- **SSL/TLS**: Let's Encrypt integration, strong cipher suites
+- **Firewall**: UFW configuration with appropriate rules
+- **User Isolation**: Dedicated deployment users with limited privileges
+- **Database Security**: Secure database configuration and access controls
