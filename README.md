@@ -151,7 +151,43 @@ Add this to your Claude Desktop configuration (e.g., `~/Library/Application\ Sup
 
 ---
 
-## 📌 Maintenance Notes
+## 🤖 AI Agent Skills
+
+This project includes custom AI agent skills for **Claude Code** and **Antigravity**. These skills provide high-level commands for production deployments by automating environment setup, service configuration, and Ansible execution.
+
+### Installation
+
+You can install the skills specifically for your preferred agent:
+
+```bash
+# Install Antigravity Agent skills (recommended for Antigravity)
+./install-skills.sh --agent
+
+# Install Claude Code skills
+./install-skills.sh --claude
+
+# Install both
+./install-skills.sh --all
+```
+
+### Available Skills
+
+- **`deploy-website`**: Basic production website deployment with environment setup, dependency management, and basic serving (Nginx/PM2).
+- **`deploy-website-enhanced`**: Comprehensive production deployment with full Ansible integration. Supports multiple stacks (LAMP, Node.js, etc.) and database integration.
+
+### Usage in Agents
+
+- **Antigravity**: I will automatically detect these skills in the `~/.gemini/antigravity/skills` directory and use them to guide you through complex deployments.
+- **Claude Code**: Use `/claude deploy-website` or `/claude deploy-website-enhanced` to trigger the skills.
+
+---
+
+## 🤖 AI Agent Instructions
+
+For AI agents (like Antigravity, Claude, or Roo Code) working on this repository, please refer to [AGENTS.md](AGENTS.md) for detailed context, setup commands, and best practices.
+
+---
+
 
 This project supports two execution formats:
 *   **Branch `main` (v2)**: Optimized for modern Ansible using `include_tasks`, structured YAML maps, and boolean values.

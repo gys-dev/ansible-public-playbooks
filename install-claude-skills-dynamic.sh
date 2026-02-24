@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install Claude Code Skills - Template for new machines
+# Install Claude Code Skills - Dynamic version for any machine
 # This script installs the custom Claude Code skills to the user's home directory
 
 set -e
@@ -23,6 +23,9 @@ print_warning() {
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
+
+# Get the current script directory dynamically
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 # Check if Claude Code is installed
 check_claude_code() {
@@ -56,7 +59,7 @@ create_directories() {
 install_deploy_website() {
     print_status "Installing deploy-website skill..."
 
-    # Create SKILL.md
+    # Create SKILL.md with proper YAML frontmatter
     cat > ~/.claude/skills/deploy-website/SKILL.md << 'EOF'
 ---
 name: deploy-website
@@ -94,8 +97,8 @@ This skill provides basic website deployment functionality. It handles:
 For enhanced deployment with full Ansible integration, use the `deploy-website-enhanced` skill instead.
 EOF
 
-    # Copy script
-    cp /Users/tranducy/Documents/Project/ansible-script-public/skills/deploy-website.py ~/.claude/skills/deploy-website/scripts/deploy.py
+    # Copy script from the current script directory
+    cp "${script_dir}/skills/base/deploy-website.py" ~/.claude/skills/deploy-website/scripts/deploy.py
 
     # Make executable
     chmod +x ~/.claude/skills/deploy-website/scripts/deploy.py
@@ -107,7 +110,7 @@ EOF
 install_deploy_website_enhanced() {
     print_status "Installing deploy-website-enhanced skill..."
 
-    # Create SKILL.md
+    # Create SKILL.md with proper YAML frontmatter
     cat > ~/.claude/skills/deploy-website-enhanced/SKILL.md << 'EOF'
 ---
 name: deploy-website-enhanced
@@ -149,8 +152,8 @@ This skill provides enhanced website deployment with full Ansible integration. I
 This skill integrates with the existing Ansible infrastructure in the project, reusing components like system setup, user management, service management, and security configurations.
 EOF
 
-    # Copy script
-    cp /Users/tranducy/Documents/Project/ansible-script-public/skills/deploy-website-enhanced.py ~/.claude/skills/deploy-website-enhanced/scripts/deploy.py
+    # Copy script from the current script directory
+    cp "${script_dir}/skills/base/deploy-website-enhanced.py" ~/.claude/skills/deploy-website-enhanced/scripts/deploy.py
 
     # Make executable
     chmod +x ~/.claude/skills/deploy-website-enhanced/scripts/deploy.py
@@ -233,7 +236,7 @@ EOF
 create_project_install_script() {
     print_status "Creating project installation script..."
 
-    cat > /Users/tranducy/Documents/Project/ansible-script-public/install-skills.sh << 'EOF'
+    cat > "${script_dir}/install-skills.sh" << 'EOF'
 #!/bin/bash
 
 # Install Claude Code Skills for this project
@@ -247,7 +250,7 @@ print_status() {
 print_status "Installing Claude Code skills..."
 
 # Install both skills
-./install-claude-skills.sh
+./install-claude-skills-dynamic.sh
 
 # Register skills
 ~/.claude/skills/deploy-website/register.sh
@@ -259,7 +262,7 @@ print_status "  /claude deploy-website"
 print_status "  /claude deploy-website-enhanced"
 EOF
 
-    chmod +x /Users/tranducy/Documents/Project/ansible-script-public/install-skills.sh
+    chmod +x "${script_dir}/install-skills.sh"
 
     print_status "Project installation script created successfully"
 }
@@ -268,7 +271,7 @@ EOF
 create_uninstall_script() {
     print_status "Creating uninstall script..."
 
-    cat > /Users/tranducy/Documents/Project/ansible-script-public/uninstall-skills.sh << 'EOF'
+    cat > "${script_dir}/uninstall-skills.sh" << 'EOF'
 #!/bin/bash
 
 # Uninstall Claude Code Skills
@@ -299,7 +302,7 @@ rm -rf ~/.claude/skills/deploy-website-enhanced
 print_status "Claude Code skills uninstalled successfully"
 EOF
 
-    chmod +x /Users/tranducy/Documents/Project/ansible-script-public/uninstall-skills.sh
+    chmod +x "${script_dir}/uninstall-skills.sh"
 
     print_status "Uninstall script created successfully"
 }
@@ -308,7 +311,7 @@ EOF
 create_readme() {
     print_status "Creating README file..."
 
-    cat > /Users/tranducy/Documents/Project/ansible-script-public/CLAUDE-SKILLS-README.md << 'EOF'
+    cat > "${script_dir}/CLAUDE-SKILLS-README.md" << 'EOF'
 # Claude Code Skills Installation
 
 This directory contains custom Claude Code skills for enhanced website deployment functionality.
@@ -344,7 +347,7 @@ This directory contains custom Claude Code skills for enhanced website deploymen
 
 3. **Run the installation script**:
    ```bash
-   ./install-claude-skills.sh
+   ./install-claude-skills-dynamic.sh
    ```
 
 4. **Register the skills**:
@@ -358,7 +361,7 @@ If you prefer manual installation, you can run:
 
 ```bash
 # Install skills to user directory
-./install-claude-skills.sh
+./install-claude-skills-dynamic.sh
 
 # Register skills
 ~/.claude/skills/deploy-website/register.sh
@@ -371,10 +374,10 @@ After installation, you can use the skills with the `/` prefix:
 
 ```bash
 # Basic deployment
-/claude deploy-website --source /path/to/project --domain example.com --ssl
+/claude deploy-website --source /var/www/myapp --domain myapp.com --ssl
 
 # Enhanced deployment with Ansible integration
-/claude deploy-website-enhanced --source /path/to/project --domain example.com --stack lamp --database --ssl
+/claude deploy-website-enhanced --source /var/www/myapp --domain myapp.com --stack lamp --database --ssl
 ```
 
 ## Uninstallation
